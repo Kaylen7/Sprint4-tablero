@@ -5,8 +5,9 @@ namespace Database\Seeders;
 use App\Models\Game;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Support\Facades\DB;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,6 +17,12 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::factory(5)->create();
+        User::factory()->create([
+            'name' => 'test',
+            'alias' => 'test',
+            'email' => 'test@test.com',
+            'password' => Hash::make('password1234')
+        ]);
         Game::factory(5)
             ->afterCreating(function (Game $game){
                 $host = User::inRandomOrder()->first();
