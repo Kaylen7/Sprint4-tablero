@@ -51,6 +51,15 @@ class User extends Authenticatable
 
     public function games(){
         return $this->belongsToMany(Game::class, table:"game_players")
-                    ->withPivot('joined_at', 'role', 'game_id');
+                    ->withPivot('joined_at', 'role', 'game_id')
+                    ->withTimestamps();
+    }
+
+    public function hostedGames(){
+        return $this->games()->wherePivot('role', 'host');
+    }
+
+    public function joinGame(Game $game, string $role='player'): void{
+        $game->join($this, $role);
     }
 }
