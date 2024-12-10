@@ -20,7 +20,8 @@ class GameFactory extends Factory
             'name' => fake()->words($nb = 3, $asText = true) ,
             'is_private' => fake()->boolean(),
             'max_players' => fake()->numberBetween(1, 5),
-            'event_time' => fake()->dateTime()
+            'event_time' => fake()->dateTime(),
+            'created_at' => fake()->dateTime(),
         ];
     }
 }
