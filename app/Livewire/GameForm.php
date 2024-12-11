@@ -2,10 +2,13 @@
 
 namespace App\Livewire;
 
+use App\Models\Game;
 use Livewire\Component;
 
 class GameForm extends Component
 {
+    public ?Game $game = null;
+    
     public bool $useManualAddress = true;
     public string $address = '';
     public int|null $placeId = null;
