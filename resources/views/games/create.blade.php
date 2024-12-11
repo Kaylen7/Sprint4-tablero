@@ -1,5 +1,9 @@
 <x-app-layout>
-    
+<x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('New Game') }}
+        </h2>
+    </x-slot>
 <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
     <form method="POST" action="{{ route('games.store') }}">
         @csrf
@@ -22,7 +26,7 @@
 
         <div class="block mt-4">
             <x-input-label for="event_time" :value="__('Date and time')" />
-            <x-text-input id="event_time" class="block mt-1 w-full" type="datetime-local" name="event_time" :value="old('event_time')" autofocus autocomplete="event_time" />
+            <x-text-input id="event_time" class="block mt-1 w-full" type="datetime-local" name="event_time" :value="old('event_time')" value="{{ now()->addMinutes(30) }}" autofocus autocomplete="event_time" />
             <x-input-error :messages="$errors->get('event_time')" class="mt-2" />
         </div>
 
