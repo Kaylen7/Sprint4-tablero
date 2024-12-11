@@ -42,6 +42,14 @@ class GameRequest extends FormRequest
             if(empty($this->boardgame_name) && empty($this->boardgame_id)){
                 $validator->errors()->add('boardgame', 'Boardgame missing.');
             }
+
+            if($this->max_players <= 0){
+                $validator->errors()->add('max_players', "Ha, ha, sayonara baby.");
+            }
+
+            if($this->event_time < now()){
+                $validator->errors()->add('event_time', "We still don't know how to travel back in time. Try again.");
+            }
         });
     }
     

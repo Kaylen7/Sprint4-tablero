@@ -35,7 +35,7 @@ class GameController extends Controller
     public function store(GameRequest $request)
     {
         DB::beginTransaction();
-        
+
         try {
             $game = Game::create($request->validated());
             $game->created_at = now();
@@ -43,8 +43,7 @@ class GameController extends Controller
 
             DB::commit();
 
-            Session::flash('message', "Game created successfully!");
-            return Redirect::to('games');
+            return redirect('/games')->with('message', "Game created successfully!");
 
         } catch (\Exception $e){
             Log::error('Failed to create game: ' . $e->getMessage());
@@ -52,9 +51,7 @@ class GameController extends Controller
             if (isset($game)){
                 $game->delete();
             }
-
-            Session::flash('message', "Failed to create game. Please try again.");
-        return Redirect::back()->withInput();
+            return back()->withInput()->with('message', "Failed to create game. Please try again.");
         }
         
     }
