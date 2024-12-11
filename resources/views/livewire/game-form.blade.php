@@ -47,7 +47,7 @@
     <x-input-error :messages="$errors->get('boardgame_id')" class="mt-2" />
      @else
      @if($game)
-     <x-text-input id="boardgame_name" class="block mt-1 w-full" type="text" name="boardgame_name" value="{{ $game->boardgame_name }}" required autofocus autocomplete="boardgame_name" placeholder="Carcassone" />
+     <x-text-input id="boardgame_name" class="block mt-1 w-full" type="text" name="boardgame_name" value="{{ $game->boardgame_name }}" required autofocus autocomplete="boardgame_name" />
      @else
     <x-text-input id="boardgame_name" class="block mt-1 w-full" type="text" name="boardgame_name" :value="old('boardgame_name')" required autofocus autocomplete="boardgame_name" placeholder="Carcassone" />
     @endif
