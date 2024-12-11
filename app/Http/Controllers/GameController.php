@@ -4,14 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Game;
 use Illuminate\View\View;
+use App\Policies\GamePolicy;
 use App\Http\Requests\GameRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class GameController extends Controller
 {
+    use AuthorizesRequests;
     /**
      * Display a listing of the resource.
      */
@@ -61,7 +64,13 @@ class GameController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $game = Game::find($id);
+        if (!$game){
+            return back()->with('message', "Failed to find game.");
+        }
+
+        return view('games.show')->with('game', $game);
+        
     }
 
     /**
@@ -69,7 +78,18 @@ class GameController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $game = Game::find($id);
+        if (!$game){
+            return back()->with('message', "Failed to find game.");
+        }
+        try{
+            $this->authorize('update', $game);
+        } catch(\Exception $e){
+            return back()->with('message', "Unauthorized access");
+        }
+        
+        
+        return view('games.edit')->with('game', $game);
     }
 
     /**
@@ -77,7 +97,11 @@ class GameController extends Controller
      */
     public function update(GameRequest $request, string $id)
     {
-        //
+        $game = Game::find($id);
+        $game->is_private = $request->is_private != '1' ? false : true;
+        $game->update($request->only(['name', 'max_players', 'event_time', 'address', 'boardgame_name']));
+
+        return redirect()->route('games.index')->with('message', 'Game updated sucessfully.');
     }
 
     /**
@@ -85,6 +109,16 @@ class GameController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $game = Game::find($id);
+        if (!$game){
+            return back()->with('message', "Failed to find game.");
+        }
+        try{
+            $this->authorize('delete', $game);
+        } catch(\Exception $e){
+            return back()->with('message', "You can only remove games you host.");
+        }
+        $game->delete();
+        return redirect()->route('games.index')->with('message', 'Game removed.');
     }
 }
