@@ -12,11 +12,17 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('games.index')" :active="request()->routeIs('games.index')">
-                        {{ __('Games') }}
+                    <x-nav-link :href="route('games.index', ['hosted' => false])" :active="request()->routeIs('games.index') && request()->query('hosted') == 0">
+                        {{ __('All') }}
                     </x-nav-link>
                     <x-nav-link :href="route('games.create')" :active="request()->routeIs('games.create')">
-                        {{ __('New Game') }}
+                        {{ __('New') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('games.index', ['hosted' => true])" :active="request()->routeIs('games.index') && request()->query('hosted') == 1">
+                        {{ __('Hosted') }}
+                    </x-nav-link>
+                    <x-nav-link>
+                        {{ __('Friends') }}
                     </x-nav-link>
                 </div>
             </div>

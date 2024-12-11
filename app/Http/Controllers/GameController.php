@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Game;
 use Illuminate\View\View;
 use App\Policies\GamePolicy;
+use Illuminate\Http\Request;
 use App\Http\Requests\GameRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -18,9 +19,16 @@ class GameController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $games = Game::with('players')->get();
+        $user = auth()->user();
+        
+        if($request->query('hosted')){
+           $games = $user->hostedGames()->get();
+        } else {
+            $games = Game::with('players')->get();
+        }
+        
         return view('games.index')->with('games', $games);
     }
 
@@ -85,7 +93,7 @@ class GameController extends Controller
         try{
             $this->authorize('update', $game);
         } catch(\Exception $e){
-            return back()->with('message', "Unauthorized access");
+            return back()->with('message', "You can only edit games you host.");
         }
         
         
