@@ -22,13 +22,22 @@ class GameController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        
+        $friendIds= $user->getFriends()->pluck('id');
         if($request->query('hosted')){
            $games = $user->hostedGames()->get();
         } else {
-            $games = Game::with('players')->get();
+            $games = Game::with('players')
+                        ->where('is_private', false)
+                        ->orWhereHas('players', function($query) use ($friendIds){
+                            $query->whereIn('user_id', $friendIds)
+                            ->where('role', 'host');
+                        })->orWhereHas('players', function($query) use ($user){
+                            $query->where('user_id', $user->id)
+                            ->where('role', 'host');
+                        })
+                        ->get();
         }
-        
+    
         return view('games.index')->with('games', $games);
     }
 

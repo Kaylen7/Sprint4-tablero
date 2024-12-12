@@ -3,9 +3,10 @@
 
 namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class User extends Authenticatable
 {
@@ -62,4 +63,45 @@ class User extends Authenticatable
     public function joinGame(Game $game, string $role='player'): void{
         $game->join($this, $role);
     }
+
+    public function getFriends(){
+        $allEntries = DB::table('friends')
+        ->select('user_id_one', 'user_id_two')
+        ->where('user_id_one', $this->id)
+        ->orWhere('user_id_two', $this->id)
+        ->get();
+        
+        $friendIds = $allEntries->flatMap(function ($friend) {
+            return [$friend->user_id_one, $friend->user_id_two];
+        })
+        ->reject(fn($id) => $id === $this->id)
+        ->unique()
+        ->values();
+
+        return User::whereIn('id', $friendIds)->get();;
+    }
+
+    public function addFriend(User $user){
+        $friend_id = $user->id;
+        if($this->id === $friend_id){
+            throw new \Exception ("Great self-love, but can't be registered here.");
+        }
+        
+        $min = min($this->id, $friend_id);
+        $max = max($this->id, $friend_id);
+
+        $exists = $this->getFriends()
+                    ->where('user_id_one', $min)
+                    ->where('user_id_two', $max)
+                    ->exists();
+        if($exists){
+            throw new \Exception ("Friendship registered already. Find other friends.");
+        }
+
+        $this->getFriends()->attach($friend_id, ["user_id_one" => $min, "user_id_two" => $max, "start_date" => now()]);
+    }
+
+    public function approveFriendRequest(){}
+
+    public function blockUser(){}
 }

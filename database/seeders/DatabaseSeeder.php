@@ -16,8 +16,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory(5)->create();
-        User::factory()->create([
+        User::factory(5)->afterCreating(function (User $user){
+            try{
+                $friend = User::inRandomOrder()->first();
+                $user->addFriend($friend);
+            } catch(\Exception $e){
+            };
+            
+        })->create();
+        User::factory()->afterCreating(function (User $user){
+            $friend = User::inRandomOrder()->first();
+            $user->addFriend($friend);
+        })->create([
             'name' => 'test',
             'alias' => 'test',
             'email' => 'test@test.com',
@@ -28,5 +38,6 @@ class DatabaseSeeder extends Seeder
                 $host = User::inRandomOrder()->first();
                 $game->players()->attach($host->id, ['role' => 'host', 'joined_at' => fake()->dateTime()]);
             })->create();
+        
     }
 }
