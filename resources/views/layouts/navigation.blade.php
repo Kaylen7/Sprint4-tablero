@@ -46,10 +46,10 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
+                        <x-dropdown-link :href="route('profile.edit')" :active="request()->routeIs('profile.index')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
-                        <x-dropdown-link :href="route('profile.notifications')">
+                        <x-dropdown-link :href="route('profile.notifications')" :active="request()->routeIs('profile.notifications')">
                             {{ __('Notifications') }}
                         </x-dropdown-link>
 

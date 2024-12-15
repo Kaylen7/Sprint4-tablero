@@ -5,7 +5,8 @@
         </h2>
     </x-slot>
     <livewire:flash-alert />
-    <div class="grid grid-cols-3 gap-6">
+    @if(count($friends) > 0)
+    <div class="grid sm:grid-cols-3 gap-6 mt-4">
     <div class="pending-column p-4">
         <h3 class="text-lg font-bold mb-2">Pending Friends</h3>
         @foreach ($friends->where('status', 'pending') as $friend)
@@ -27,8 +28,11 @@
         @endforeach
     </div>
 </div>
-<div>
+@endif
+<div class="w-full mt-4">
+<div class="m-auto p-4 max-w-xl sm:p-8 bg-white shadow sm:rounded-lg">
     <h1 class="text-lg font-bold mt-4">{{__('Add friends')}}</h1>
+    <p class="text-sm mt-2">Find your id in your profile.</p>
     <form method="POST" action="{{ route('friends.add') }}">
     @csrf
     <div class="block mt-4">
@@ -37,11 +41,11 @@
             <x-input-error :messages="$errors->get('friend_id')" class="mt-2" />
     </div>
     <div class="flex flex-col">
-    <x-primary-button class="mt-4">
+    <x-primary-button class="mt-4 mx-auto">
         {{__('Add Friend')}}
     </x-primary-button>
-    <p class="text-sm mt-2">Find your id in your profile.</p>
     </div>
     </form>
+</div>
 </div>
 </x-app-layout>
