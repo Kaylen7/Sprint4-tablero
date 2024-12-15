@@ -65,12 +65,8 @@ class User extends Authenticatable
     }
 
     public function getFriends(){
-        $allEntries = DB::table('friends')
-        ->select('user_id_one', 'user_id_two')
-        ->where('user_id_one', $this->id)
-        ->orWhere('user_id_two', $this->id)
-        ->get();
-        
+
+        $allEntries = $this->getFriendRequests();
         $friendIds = $allEntries->flatMap(function ($friend) {
             return [$friend->user_id_one, $friend->user_id_two];
         })
@@ -78,10 +74,22 @@ class User extends Authenticatable
         ->unique()
         ->values();
 
-        return User::whereIn('id', $friendIds)->get();;
+        $users = User::whereIn('id', $friendIds)->get();
+
+        $usersWithPivot = $users->map(function($user) use ($allEntries){
+            $pivot = $allEntries->first(function ($entry) use ($user){
+                return ($entry->user_id_one === $user->id && $entry->user_id_two === $this->id) || ($entry->user_id_two === $user->id && $entry->user_id_one === $this->id);
+            });
+            $user->status = $pivot->status ?? null;
+            $user->start_date = $pivot->start_date ?? null;
+
+            return $user;
+        });
+
+        return $usersWithPivot;
     }
 
-    public function addFriend(User $user){
+    public function addFriend(User $user): void{
         $friend_id = $user->id;
         if($this->id === $friend_id){
             throw new \Exception ("Great self-love, but can't be registered here.");
@@ -90,18 +98,57 @@ class User extends Authenticatable
         $min = min($this->id, $friend_id);
         $max = max($this->id, $friend_id);
 
-        $exists = $this->getFriends()
-                    ->where('user_id_one', $min)
-                    ->where('user_id_two', $max)
-                    ->exists();
-        if($exists){
+        $alreadyFriends = DB::table('friends')
+                        ->where('user_id_one', $min)
+                        ->where('user_id_two', $max)
+                        ->exists();
+        if($alreadyFriends){
             throw new \Exception ("Friendship registered already. Find other friends.");
         }
 
-        $this->getFriends()->attach($friend_id, ["user_id_one" => $min, "user_id_two" => $max, "start_date" => now()]);
+        DB::table('friends')->insert([
+            'user_id_one' => $min,
+            'user_id_two' => $max,
+            'start_date' => now()
+        ]);
     }
 
-    public function approveFriendRequest(){}
+    public function getFriendRequests(){
+        return DB::table('friends')
+        ->where('user_id_one', $this->id)
+        ->orWhere('user_id_two', $this->id)
+        ->get();
+    }
 
-    public function blockUser(){}
+    public function changeFriendRequestStatus(int $senderId, string $status){
+        $min = min($this->id, $senderId);
+        $max = max($this->id, $senderId);
+
+        $type = match($status){
+            'accepted' => 'accepted',
+            'blocked' => 'blocked',
+            default => throw new \Exception('Unrecognized status')
+        };
+
+        return DB::table('friends')
+        ->where('user_id_one', $min)
+        ->where('user_id_two', $max)
+        ->update(['status' => $type]);
+    }
+
+    public function removeFriendRequest(int $userId){
+        $min = min($this->id, $userId);
+        $max = max($this->id, $userId);
+
+        return DB::table('friends')
+        ->where('user_id_one', $min)
+        ->where('user_id_two', $max)
+        ->delete();
+    }
+
+    public function removeNotification(string $notificationId){
+        return DB::table('notifications')
+        ->where('id', $notificationId)
+        ->delete();
+    }
 }
