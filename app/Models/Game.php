@@ -36,10 +36,13 @@ class Game extends Model
 
         $gameHostId = $this->players()->wherePivot('role', 'host')->pluck('user_id');
         $host = User::find($gameHostId)->first();
-        $hostFriends = $host->getFriends();
-        if($this->is_private && !$hostFriends->contains($user_id)){
-            throw new \Exception("Can't join foreign game.");
+        if($host){
+            $hostFriends = $host->getFriends();
+            if($this->is_private && !$hostFriends->contains($user_id)){
+                throw new \Exception("Can't join foreign game.");
+            }
         }
+        
 
         if($role === 'host' && $this->players()->wherePivot('role', 'host')->exists()){
             throw new \Exception('This game already has a host.');
