@@ -11,6 +11,7 @@ class FlashAlert extends Component
     public function hideAlert()
     {
         $this->isVisible = false;
+        session()->forget('message');
     }
 
 }
