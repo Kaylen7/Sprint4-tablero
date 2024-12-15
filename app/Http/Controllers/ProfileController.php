@@ -21,6 +21,11 @@ class ProfileController extends Controller
         ]);
     }
 
+    public function notifications(): View{
+        $notifications = auth()->user()->notifications;
+        return view('profile.notifications')->with('notifications', $notifications);
+    }
+
     /**
      * Update the user's profile information.
      */

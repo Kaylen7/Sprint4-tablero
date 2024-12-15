@@ -22,11 +22,32 @@ class GameController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $friendIds= $user->getFriends()->pluck('id');
+        $data = [
+            'games' => [],
+            'hosted' => false
+        ];
+
+        //Handle notifications
+        $notifications = $user->notifications;
+        
+        if(count($notifications) > 0){
+            foreach($notifications as $notification){
+                if(preg_match('/FriendRequestNotification/', $notification->type)){
+                    Session::put(['message' => 'You have notifications.']);
+                    break;
+                }
+            }
+        }
+        
+        // Handle view
+        $friendIds= $user->getFriends()->filter(function($friend){
+            return $friend->status === 'accepted';
+        })->pluck('id');
         if($request->query('hosted')){
-           $games = $user->hostedGames()->get();
+           $data['games'] = $user->hostedGames()->get();
+           $data['hosted'] = true;
         } else {
-            $games = Game::with('players')
+            $data['games'] = Game::with('players')
                         ->where('is_private', false)
                         ->orWhereHas('players', function($query) use ($friendIds){
                             $query->whereIn('user_id', $friendIds)
@@ -38,7 +59,7 @@ class GameController extends Controller
                         ->get();
         }
     
-        return view('games.index')->with('games', $games);
+        return view('games.index')->with('data', $data);
     }
 
     /**
