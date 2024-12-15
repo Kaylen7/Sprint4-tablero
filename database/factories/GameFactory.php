@@ -16,12 +16,15 @@ class GameFactory extends Factory
      */
     public function definition(): array
     {
+        $gameNames = ['Carcassone', 'Catán', 'Dixit', 'Exploding Kittens', '7 Wonders', 'Omerta'];
+
         return [
             'name' => fake()->words($nb = 3, $asText = true) ,
             'is_private' => fake()->boolean(),
             'max_players' => fake()->numberBetween(1, 5),
-            'event_time' => fake()->dateTime(),
-            'created_at' => fake()->dateTime(),
+            'event_time' => fake()->dateTimeThisYear(),
+            'address' => fake()->address(),
+            'boardgame_name' => $gameNames[array_rand($gameNames)]
         ];
     }
 }
