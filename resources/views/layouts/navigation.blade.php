@@ -12,7 +12,7 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('games.index', ['hosted' => false])" :active="request()->routeIs('games.index') && request()->query('hosted') == 0">
+                    <x-nav-link :href="route('games.index', ['hosted' => false])" :active="request()->routeIs('games.index') && request()->query('hosted') == 0 && request()->query('joined') == 0">
                         {{ __('All') }}
                     </x-nav-link>
                     <x-nav-link :href="route('games.create')" :active="request()->routeIs('games.create')">
@@ -20,6 +20,9 @@
                     </x-nav-link>
                     <x-nav-link :href="route('games.index', ['hosted' => true])" :active="request()->routeIs('games.index') && request()->query('hosted') == 1">
                         {{ __('Hosted') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('games.index', ['joined' => true])" :active="request()->routeIs('games.index') && request()->query('joined') == 1">
+                        {{ __('Joined') }}
                     </x-nav-link>
                     <x-nav-link :href="route('friends.index', ['hosted' => true])" :active="request()->routeIs('friends.index')">
                         {{ __('Friends') }}
