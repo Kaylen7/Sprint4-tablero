@@ -21,7 +21,12 @@ class GamePolicy
      */
     public function view(User $user, Game $game): bool
     {
-        return false;
+        $host = $game->players()
+        ->wherePivot('role', 'host')
+        ->where('users.id', $user->id)
+        ->exists();
+
+        return $host;
     }
 
     /**
