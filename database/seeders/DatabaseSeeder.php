@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Game;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use App\Events\FriendRequestSent;
 use Illuminate\Support\Facades\DB;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Support\Facades\Hash;
@@ -20,13 +21,15 @@ class DatabaseSeeder extends Seeder
             try{
                 $friend = User::inRandomOrder()->first();
                 $user->addFriend($friend);
+                FriendRequestSent::dispatch($user, $friend);
             } catch(\Exception $e){
             };
             
         })->create();
         User::factory()->afterCreating(function (User $user){
-            $friend = User::inRandomOrder()->first();
+            $friend = User::find(1);
             $user->addFriend($friend);
+            FriendRequestSent::dispatch($user, $friend);
         })->create([
             'name' => 'test',
             'alias' => 'test',
