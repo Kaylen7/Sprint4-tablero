@@ -19,6 +19,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('games', GameController::class);
+    Route::post('/games/join', [GameController::class, 'join'])->name('games.join');
+    Route::post('games/leave', [GameController::class, 'leave'])->name('games.leave');
     Route::get('/friends', [FriendController::class, 'index'])->name('friends.index');
     Route::post('/friends', [FriendController::class, 'add'])->name('friends.add');
     Route::post('/friends/accept', [FriendController::class, 'accept'])->name('friends.accept');

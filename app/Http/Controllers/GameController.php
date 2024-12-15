@@ -24,7 +24,8 @@ class GameController extends Controller
         $user = auth()->user();
         $data = [
             'games' => [],
-            'hosted' => false
+            'hosted' => false,
+            'joined' => false
         ];
 
         //Handle notifications
@@ -46,7 +47,10 @@ class GameController extends Controller
         if($request->query('hosted')){
            $data['games'] = $user->hostedGames()->get();
            $data['hosted'] = true;
-        } else {
+        } elseif($request->query('joined')){
+            $data['games'] = $user->getJoinedGames()->get();
+            $data['joined'] = true;
+        }else {
             $data['games'] = Game::with('players')
                         ->where('is_private', false)
                         ->orWhereHas('players', function($query) use ($friendIds){
@@ -102,12 +106,27 @@ class GameController extends Controller
      */
     public function show(string $id)
     {
+        $user = auth()->user();
         $game = Game::find($id);
         if (!$game){
             return back()->with('message', "Failed to find game.");
         }
-
-        return view('games.show')->with('game', $game);
+        $data = [
+            'game' => $game,
+            'hosted' => false,
+            'joined' => false
+        ];
+        try {
+            $this->authorize('view', $game);
+            $data['hosted'] = true;
+        } catch (\Exception $e){
+            $inGame = $game->inGame($user->id);
+            if($inGame){
+                $data['joined'] = true;
+            }
+        }
+        
+        return view('games.show')->with('data', $data);
         
     }
 
@@ -158,5 +177,32 @@ class GameController extends Controller
         }
         $game->delete();
         return redirect()->route('games.index')->with('message', 'Game removed.');
+    }
+
+    public function join(Request $request){
+        $gameId = $request->input('game_id');
+        $user = auth()->user();
+        $game = Game::find($gameId);
+        try {
+            $game->join($user->id);
+        } catch (\Exception $e){
+            return back()->with('message', $e->getMessage());
+        }
+        
+        
+        return back()->with('message', "Joined game.");
+    }
+
+    public function leave(Request $request){
+        $user = auth()->user();
+        $gameId = $request->input('game_id');
+        $game = Game::find($gameId);
+        try {
+            $game->leave($user->id);
+        } catch (\Exception $e){
+            return back()->with('message', $e->getMessage());
+        }
+
+        return back()->with('message', 'Left game.');
     }
 }

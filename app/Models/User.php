@@ -64,6 +64,10 @@ class User extends Authenticatable
         $game->join($this, $role);
     }
 
+    public function getJoinedGames(){
+        return $this->games()->wherePivot('role', 'player');
+    }
+
     public function getFriends(){
 
         $allEntries = $this->getFriendRequests();
