@@ -21,7 +21,7 @@
                     <x-nav-link :href="route('games.index', ['hosted' => true])" :active="request()->routeIs('games.index') && request()->query('hosted') == 1">
                         {{ __('Hosted') }}
                     </x-nav-link>
-                    <x-nav-link>
+                    <x-nav-link :href="route('friends.index', ['hosted' => true])" :active="request()->routeIs('friends.index')">
                         {{ __('Friends') }}
                     </x-nav-link>
                 </div>
@@ -45,6 +45,9 @@
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
+                        </x-dropdown-link>
+                        <x-dropdown-link :href="route('profile.notifications')">
+                            {{ __('Notifications') }}
                         </x-dropdown-link>
 
                         <!-- Authentication -->
@@ -76,8 +79,23 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('games.index')" :active="request()->routeIs('games.index')">
-                {{ __('Games') }}
+            <x-responsive-nav-link :href="route('games.index')" :active="request()->routeIs('games.index') && request()->query('hosted') == 0">
+                {{ __('All') }}
+            </x-responsive-nav-link>
+        </div>
+        <div class="pt-2 pb-3 space-y-1">
+            <x-responsive-nav-link :href="route('games.create')" :active="request()->routeIs('games.create')">
+                {{ __('New') }}
+            </x-responsive-nav-link>
+        </div>
+        <div class="pt-2 pb-3 space-y-1">
+            <x-responsive-nav-link :href="route('games.index')" :active="request()->routeIs('games.index') && request()->query('hosted') == 1">
+                {{ __('Hosted') }}
+            </x-responsive-nav-link>
+        </div>
+        <div class="pt-2 pb-3 space-y-1">
+            <x-responsive-nav-link :href="route('friends.index')" :active="request()->routeIs('friends.index')">
+                {{ __('Friends') }}
             </x-responsive-nav-link>
         </div>
 
@@ -91,6 +109,9 @@
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('profile.notifications')">
+                    {{ __('Notifications') }}
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->
