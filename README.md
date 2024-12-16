@@ -38,7 +38,8 @@ docker run --rm \
 #Or with seeds:
 ./vendor/bin/sail artisan migrate --seed
 ```
->[!WARNING] Troubleshoot MYSQL errors
+>[!WARNING]
+> **Troubleshoot MYSQL errors**  
 > If there's errors on migration, make sure MYSQL container is running: `./vendor/bin/sail ps`.  
 > If it isn't, restart the containers: 
 >```sh
