@@ -15,6 +15,15 @@ Follow these steps to test password recovery email locally, or if you don't want
 
 1. Clone this repo and `cd` to root directory.
 2. Copy example environment file: `cp .env.example .env`.
+Make sure that database correctly points to mysql docker container:
+```.env
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=tablero
+DB_USERNAME=sail
+DB_PASSWORD=password
+```
 3. Docker install composer dependencies and set up Sail:
 ```sh
 docker run --rm \
@@ -65,10 +74,10 @@ Access the application:
 - Run npm commands: `./vendor/bin/sail npm [command]`
 
 ## ⚙️ Development Setup Without Docker/Sail
-Follow these steps to set up the application locally for development.  
+Follow these steps to set up the application locally for development.    
 1. Clone this repo and `cd` to root directory.
-2. Copy example .env: `cp .env.example .env` and set your own SQL database conection. Make sure to uncomment lines removing `#`. 
-```sql
+2. Copy example .env: `cp .env.example .env` and set your own SQL database conection. Make sure to change `DB_HOST` to localhost and `DB_USERNAME, DB_PASSWORD` to your sql server info. 
+```.env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
@@ -78,7 +87,9 @@ DB_PASSWORD=dbPassword
 ```
 3. Install php dependencies with `composer install`.
 4. Generate key with `php artisan key:generate`.
-5. Migrate database: `php artisan migrate`. Optionally, you can use `php artisan migrate --seed` to populate database with fake data. 
+5. Remember to have mysql server up and running before attempting to run migrations.
+   - Migrate database: `php artisan migrate`.
+   - Optionally, you can use `php artisan migrate --seed` to populate database with fake data. 
 6. Install and start frontend assets:
 ```sh
 npm install
